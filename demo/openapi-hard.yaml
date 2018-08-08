@@ -1,0 +1,80 @@
+openapi: 3.0.1
+info:
+  version: 0.0.1
+  title: My cool API
+
+paths:
+  # My Thing
+  /mything:
+    post:
+      tags:
+      - My thing
+      summary: Add My Thing
+      description: Add a new my thing
+      operationId: api.addMyThing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MyThingCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyThingCreateResponse'
+
+components:
+  schemas:
+    ThingA:
+      type: object
+      properties:
+        thinga:
+          $ref: '#/components/schemas/ThingA'
+    ThingB:
+      type: object
+      properties:
+        thingb:
+          type: string
+    ThingC:
+      type: object
+      properties:
+        thingc:
+          type: string
+    MyThing:
+      allOf:
+        - oneOf:
+          - allOf:
+            - title: Option 1
+            - $ref: '#/components/schemas/ThingB'
+          - allOf:
+            - title: Option 2
+            - $ref: '#/components/schemas/ThingA'
+          - allOf:
+            - title: Option 3
+            - $ref: '#/components/schemas/ThingB'
+            - $ref: '#/components/schemas/ThingA'
+        - $ref: '#/components/schemas/ThingC'
+
+    MyThingCreate:
+      allOf:
+        - $ref: '#/components/schemas/MyThing'
+        - required:
+          - thinga
+          - thingb
+    MyThingCreateResponse:
+      type: object
+      properties:
+        thing1:
+          type: string
+
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []

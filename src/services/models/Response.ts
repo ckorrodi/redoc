@@ -1,6 +1,6 @@
 import { action, observable } from 'mobx';
 
-import { OpenAPIResponse, Referenced } from '../../types';
+import { OpenAPIResponse } from '../../types';
 
 import { getStatusCodeType } from '../../utils';
 import { OpenAPIParser } from '../OpenAPIParser';
@@ -22,33 +22,30 @@ export class ResponseModel {
     parser: OpenAPIParser,
     code: string,
     defaultAsError: boolean,
-    infoOrRef: Referenced<OpenAPIResponse>,
+    response: OpenAPIResponse,
     options: RedocNormalizedOptions,
   ) {
     this.expanded = options.expandResponses === 'all' || options.expandResponses[code];
-
-    const info = parser.deref(infoOrRef);
-    parser.exitRef(infoOrRef);
     this.code = code;
-    if (info.content !== undefined) {
-      this.content = new MediaContentModel(parser, info.content, false, options);
+    if (response.content !== undefined) {
+      this.content = new MediaContentModel(parser, response.content, false, options);
     }
 
-    if (info['x-summary'] !== undefined) {
-      this.summary = info['x-summary'];
-      this.description = info.description || '';
+    if (response['x-summary'] !== undefined) {
+      this.summary = response['x-summary'];
+      this.description = response.description || '';
     } else {
-      this.summary = info.description || '';
+      this.summary = response.description || '';
       this.description = '';
     }
 
     this.type = getStatusCodeType(code, defaultAsError);
 
-    const headers = info.headers;
+    const headers = response.headers;
     if (headers !== undefined) {
       this.headers = Object.keys(headers).map(name => {
         const header = headers[name];
-        return new FieldModel(parser, { ...header, name }, '', options);
+        return new FieldModel(parser, { ...header, name } as any, '', options);
       });
     }
   }

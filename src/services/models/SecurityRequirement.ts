@@ -16,7 +16,7 @@ export class SecurityRequirementModel {
 
     this.schemes = Object.keys(requirement || {})
       .map(id => {
-        const scheme = parser.deref(schemes[id]);
+        const scheme = schemes[id];
         const scopes = requirement[id] || [];
 
         if (!scheme) {

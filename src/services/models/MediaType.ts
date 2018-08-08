@@ -28,10 +28,10 @@ export class MediaTypeModel {
     this.isRequestType = isRequestType;
     this.schema = info.schema && new SchemaModel(parser, info.schema, '', options);
     if (info.examples !== undefined) {
-      this.examples = mapValues(info.examples, example => new ExampleModel(parser, example));
+      this.examples = mapValues(info.examples, example => new ExampleModel(example));
     } else if (info.example !== undefined) {
       this.examples = {
-        default: new ExampleModel(parser, { value: info.example }),
+        default: new ExampleModel({ value: info.example }),
       };
     } else if (isJsonLike(name)) {
       this.generateExample(parser, info);
@@ -58,7 +58,7 @@ export class MediaTypeModel {
       }
     } else {
       this.examples = {
-        default: new ExampleModel(parser, {
+        default: new ExampleModel({
           value: Sampler.sample(
             info.schema,
             { skipReadOnly: this.isRequestType, skipWriteOnly: !this.isRequestType },

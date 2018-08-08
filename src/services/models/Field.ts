@@ -1,6 +1,6 @@
 import { action, observable } from 'mobx';
 
-import { OpenAPIParameter, Referenced } from '../../types';
+import { OpenAPIParameter } from '../../types';
 import { RedocNormalizedOptions } from '../RedocNormalizedOptions';
 
 import { OpenAPIParser } from '../OpenAPIParser';
@@ -23,22 +23,20 @@ export class FieldModel {
 
   constructor(
     parser: OpenAPIParser,
-    infoOrRef: Referenced<OpenAPIParameter> & { name?: string; kind?: string },
+    field: OpenAPIParameter & { name?: string; kind?: string },
     pointer: string,
     options: RedocNormalizedOptions,
   ) {
-    const info = parser.deref<OpenAPIParameter>(infoOrRef);
-    this.kind = infoOrRef.kind || 'field';
-    this.name = infoOrRef.name || info.name;
-    this.in = info.in;
-    this.required = !!info.required;
-    this.schema = new SchemaModel(parser, info.schema || {}, pointer, options);
+    this.kind = field.kind || 'field';
+    this.name = field.name || field.name;
+    this.in = field.in;
+    this.required = !!field.required;
+    this.schema = new SchemaModel(parser, field.schema || {}, pointer, options);
     this.description =
-      info.description === undefined ? this.schema.description || '' : info.description;
-    this.example = info.example || this.schema.example;
+      field.description === undefined ? this.schema.description || '' : field.description;
+    this.example = field.example || this.schema.example;
 
-    this.deprecated = info.deprecated === undefined ? !!this.schema.deprecated : info.deprecated;
-    parser.exitRef(infoOrRef);
+    this.deprecated = field.deprecated === undefined ? !!this.schema.deprecated : field.deprecated;
   }
 
   @action

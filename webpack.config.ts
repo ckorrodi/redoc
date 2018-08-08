@@ -139,7 +139,7 @@ export default (env: { standalone?: boolean } = {}, { mode }) => ({
     new ForkTsCheckerWebpackPlugin({ silent: true }),
     new webpack.BannerPlugin(BANNER),
     ignore(/js-yaml\/dumper\.js$/),
-    ignore(/json-schema-ref-parser\/lib\/dereference\.js/),
+    // ignore(/json-schema-ref-parser\/lib\/dereference\.js/),
     env.standalone ? ignore(/^\.\/SearchWorker\.worker$/) : ignore(/$non-existing^/),
   ],
 });

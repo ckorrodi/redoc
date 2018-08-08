@@ -2,20 +2,23 @@ import { FieldModel } from '../../models/Field';
 import { OpenAPIParser } from '../../OpenAPIParser';
 import { RedocNormalizedOptions } from '../../RedocNormalizedOptions';
 
+import { loadAndBundleSpec } from '../../../utils/loadAndBundleSpec';
+
 const opts = new RedocNormalizedOptions({});
 
 describe('Models', () => {
   describe('FieldModel', () => {
     let parser;
-    const spec = require('../fixtures/fields.json');
-    parser = new OpenAPIParser(spec, undefined, opts);
+
+    beforeEach(async () => {
+      const spec = await loadAndBundleSpec(require('../fixtures/fields.json'));
+      parser = new OpenAPIParser(spec, undefined, opts);
+    });
 
     test('basic field details', () => {
       const field = new FieldModel(
         parser,
-        {
-          $ref: '#/components/parameters/testParam',
-        },
+        parser.spec.components!.parameters!.testParam,
         '#/components/parameters/testParam',
         opts,
       );
@@ -29,14 +32,10 @@ describe('Models', () => {
     test('field name should populated from name even if $ref (headers)', () => {
       const field = new FieldModel(
         parser,
-        {
-          $ref: '#/components/headers/testHeader',
-          name: 'Test-Header',
-        },
+        parser.spec.components!.headers!.testTest,
         '#/components/headers/testHeader',
         opts,
       );
-
       expect(field.name).toEqual('Test-Header');
     });
   });

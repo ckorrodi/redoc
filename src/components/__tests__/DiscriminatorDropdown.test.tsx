@@ -6,6 +6,8 @@ import * as React from 'react';
 
 import { filterPropsDeep } from '../../utils/test-utils';
 
+import { loadAndBundleSpec } from '../../utils/loadAndBundleSpec';
+
 import { ObjectSchema, Schema } from '../';
 import { OpenAPIParser, SchemaModel } from '../../services';
 import { RedocNormalizedOptions } from '../../services/RedocNormalizedOptions';
@@ -15,12 +17,20 @@ const options = new RedocNormalizedOptions({});
 describe('Components', () => {
   describe('SchemaView', () => {
     describe('discriminator', () => {
-      it('should correctly render SchemaView', () => {
-        const parser = new OpenAPIParser(simpleDiscriminatorFixture, undefined, options);
+      let parser: OpenAPIParser;
+      beforeEach(async () => {
+        parser = new OpenAPIParser(
+          await loadAndBundleSpec(simpleDiscriminatorFixture),
+          undefined,
+          options,
+        );
+      });
 
+      it('should correctly render SchemaView', async () => {
         const schema = new SchemaModel(
           parser,
-          { $ref: '#/components/schemas/Pet' },
+          // { $ref: '#/components/schemas/Pet' },
+          parser.spec.components!.schemas!.Pet,
           '#/components/schemas/Pet',
           options,
         );
@@ -32,11 +42,9 @@ describe('Components', () => {
       });
 
       it('should correctly render discriminator dropdown', () => {
-        const parser = new OpenAPIParser(simpleDiscriminatorFixture, undefined, options);
-
         const schema = new SchemaModel(
           parser,
-          { $ref: '#/components/schemas/Pet' },
+          parser.spec.components!.schemas!.Pet,
           '#/components/schemas/Pet',
           options,
         );

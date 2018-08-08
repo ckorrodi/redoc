@@ -22,34 +22,33 @@ export class SecuritySchemeModel {
     connectUrl: string;
   };
 
-  constructor(parser: OpenAPIParser, id: string, scheme: Referenced<OpenAPISecurityScheme>) {
-    const info = parser.deref(scheme);
+  constructor(id: string, scheme: Referenced<OpenAPISecurityScheme>) {
     this.id = id;
     this.sectionId = SECURITY_SCHEMES_SECTION + id;
-    this.type = info.type;
-    this.description = info.description || '';
-    if (info.type === 'apiKey') {
+    this.type = scheme.type;
+    this.description = scheme.description || '';
+    if (scheme.type === 'apiKey') {
       this.apiKey = {
-        name: info.name!,
-        in: info.in,
+        name: scheme.name!,
+        in: scheme.in,
       };
     }
 
-    if (info.type === 'http') {
+    if (scheme.type === 'http') {
       this.http = {
-        scheme: info.scheme!,
-        bearerFormat: info.bearerFormat,
+        scheme: scheme.scheme!,
+        bearerFormat: scheme.bearerFormat,
       };
     }
 
-    if (info.type === 'openIdConnect') {
+    if (scheme.type === 'openIdConnect') {
       this.openId = {
-        connectUrl: info.openIdConnectUrl!,
+        connectUrl: scheme.openIdConnectUrl!,
       };
     }
 
-    if (info.type === 'oauth2' && info.flows) {
-      this.flows = info.flows;
+    if (scheme.type === 'oauth2' && scheme.flows) {
+      this.flows = scheme.flows;
     }
   }
 }
@@ -59,8 +58,6 @@ export class SecuritySchemesModel {
 
   constructor(parser: OpenAPIParser) {
     const schemes = (parser.spec.components && parser.spec.components.securitySchemes) || {};
-    this.schemes = Object.keys(schemes).map(
-      name => new SecuritySchemeModel(parser, name, schemes[name]),
-    );
+    this.schemes = Object.keys(schemes).map(name => new SecuritySchemeModel(name, schemes[name]));
   }
 }

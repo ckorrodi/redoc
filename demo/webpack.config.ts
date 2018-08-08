@@ -131,7 +131,7 @@ export default (env: { playground?: boolean; bench?: boolean } = {}, { mode }) =
     }),
     new ForkTsCheckerWebpackPlugin(),
     ignore(/js-yaml\/dumper\.js$/),
-    ignore(/json-schema-ref-parser\/lib\/dereference\.js/),
+    // ignore(/json-schema-ref-parser\/lib\/dereference\.js/),
     ignore(/^\.\/SearchWorker\.worker$/),
     new CopyWebpackPlugin(['demo/openapi.yaml']),
   ],

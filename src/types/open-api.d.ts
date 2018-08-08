@@ -40,7 +40,11 @@ export interface OpenAPIRef {
   $ref: string;
 }
 
-export type Referenced<T> = OpenAPIRef | T;
+export interface NewRef {
+  __pointer?: string;
+}
+
+export type Referenced<T> = T & NewRef;
 
 export interface OpenAPIPath {
   summary?: string;

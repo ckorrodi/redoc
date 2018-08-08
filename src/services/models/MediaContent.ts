@@ -30,8 +30,6 @@ export class MediaContentModel {
     }
     this.mediaTypes = Object.keys(info).map(name => {
       const mime = info[name];
-      // reset deref cache just in case something is left there
-      parser.resetVisited();
       return new MediaTypeModel(parser, name, isRequestType, mime, options);
     });
   }

@@ -1,5 +1,4 @@
 import { OpenAPIExample, Referenced } from '../../types';
-import { OpenAPIParser } from '../OpenAPIParser';
 
 export class ExampleModel {
   value: any;
@@ -7,8 +6,7 @@ export class ExampleModel {
   description?: string;
   externalValue?: string;
 
-  constructor(parser: OpenAPIParser, infoOrRef: Referenced<OpenAPIExample>) {
-    Object.assign(this, parser.deref(infoOrRef));
-    parser.exitRef(infoOrRef);
+  constructor(infoOrRef: Referenced<OpenAPIExample>) {
+    Object.assign(this, infoOrRef);
   }
 }

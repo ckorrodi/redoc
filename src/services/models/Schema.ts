@@ -59,17 +59,15 @@ export class SchemaModel {
    */
   constructor(
     parser: OpenAPIParser,
-    schemaOrRef: Referenced<OpenAPISchema>,
+    schema: Referenced<OpenAPISchema>,
     pointer: string,
     private options: RedocNormalizedOptions,
     isChild: boolean = false,
   ) {
-    this.pointer = schemaOrRef.$ref || pointer || '';
-    this.rawSchema = parser.deref(schemaOrRef);
+    this.rawSchema = schema;
+    this.pointer = schema.__pointer || pointer || '';
     this.schema = parser.mergeAllOf(this.rawSchema, this.pointer, isChild);
     this.init(parser, isChild);
-
-    parser.exitRef(schemaOrRef);
 
     for (const parent$ref of this.schema.parentRefs || []) {
       // exit all the refs visited during allOf traverse

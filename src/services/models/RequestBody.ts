@@ -1,4 +1,4 @@
-import { OpenAPIRequestBody, Referenced } from '../../types';
+import { OpenAPIRequestBody } from '../../types';
 
 import { OpenAPIParser } from '../OpenAPIParser';
 import { RedocNormalizedOptions } from '../RedocNormalizedOptions';
@@ -9,15 +9,9 @@ export class RequestBodyModel {
   required: boolean;
   content?: MediaContentModel;
 
-  constructor(
-    parser: OpenAPIParser,
-    infoOrRef: Referenced<OpenAPIRequestBody>,
-    options: RedocNormalizedOptions,
-  ) {
-    const info = parser.deref(infoOrRef);
+  constructor(parser: OpenAPIParser, info: OpenAPIRequestBody, options: RedocNormalizedOptions) {
     this.description = info.description || '';
     this.required = !!info.required;
-    parser.exitRef(infoOrRef);
     if (info.content !== undefined) {
       this.content = new MediaContentModel(parser, info.content, true, options);
     }

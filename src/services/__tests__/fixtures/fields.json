@@ -15,9 +15,14 @@
     "headers": {
       "testHeader": {
         "description": "The response content language",
+        "name": "some other name",
         "schema": {
           "type": "string"
         }
+      },
+      "testTest": {
+        "name": "Test-Header",
+        "$ref": "#/components/headers/testHeader"
       }
     }
   }

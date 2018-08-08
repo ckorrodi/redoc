@@ -148,21 +148,10 @@ export class OpenAPIParser {
    */
   deref<T extends object>(obj: OpenAPIRef | T, forceCircular: boolean = false): T {
     if (this.isRef(obj)) {
-      const resolved = this.byRef<T>(obj.$ref)!;
-      const visited = this._refCounter.visited(obj.$ref);
-      this._refCounter.visit(obj.$ref);
-      if (visited && !forceCircular) {
-        // circular reference detected
-        // tslint:disable-next-line
-        return Object.assign({}, resolved, { 'x-circular-ref': true });
-      }
-      // deref again in case one more $ref is here
-      if (this.isRef(resolved)) {
-        const res = this.deref(resolved);
-        this.exitRef(resolved);
-        return res;
-      }
-      return resolved;
+      return this.byRef(obj.$ref)!;
+    }
+    if (forceCircular === true) {
+      return obj;
     }
     return obj;
   }
@@ -206,9 +195,8 @@ export class OpenAPIParser {
     }
 
     const allOfSchemas = schema.allOf.map(subSchema => {
-      const resolved = this.deref(subSchema, forceCircular);
-      const subRef = subSchema.$ref || undefined;
-      const subMerged = this.mergeAllOf(resolved, subRef, forceCircular);
+      const subRef = (subSchema as any).__pointer || undefined;
+      const subMerged = this.mergeAllOf(subSchema, subRef, forceCircular);
       receiver.parentRefs!.push(...(subMerged.parentRefs || []));
       return {
         $ref: subRef,
@@ -234,6 +222,12 @@ export class OpenAPIParser {
         for (const prop in subSchema.properties) {
           if (!receiver.properties[prop]) {
             receiver.properties[prop] = subSchema.properties[prop];
+            // if (receiver.properties[prop]['x-circular-ref']) {
+            //   receiver.properties[prop] = {
+            //     ...receiver.properties[prop],
+            //     'x-circular-ref': undefined,
+            //   } as any;
+            // }
           } else {
             // merge inner properties
             receiver.properties[prop] = this.mergeAllOf(
@@ -259,7 +253,8 @@ export class OpenAPIParser {
 
       // merge rest of constraints
       // TODO: do more intelegent merge
-      receiver = { ...subSchema, ...receiver };
+      // receiver = { ...subSchema, discriminator: undefined, ...receiver };
+      receiver = { ...subSchema, ...receiver } as any;
 
       if (subSchemaRef) {
         receiver.parentRefs!.push(subSchemaRef);
@@ -286,10 +281,12 @@ export class OpenAPIParser {
     const res: Dict<string> = {};
     const schemas = (this.spec.components && this.spec.components.schemas) || {};
     for (const defName in schemas) {
-      const def = this.deref(schemas[defName]);
+      const def = schemas[defName];
       if (
         def.allOf !== undefined &&
-        def.allOf.find(obj => obj.$ref !== undefined && $refs.indexOf(obj.$ref) > -1)
+        def.allOf.find(
+          obj => (obj as any).__pointer !== undefined && $refs.indexOf((obj as any).__pointer) > -1,
+        )
       ) {
         res['#/components/schemas/' + defName] = def['x-discriminator-value'] || defName;
       }
